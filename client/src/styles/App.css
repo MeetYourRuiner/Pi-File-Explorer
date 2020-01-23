@@ -1,0 +1,44 @@
+.noselect {
+	-webkit-touch-callout: none; /* iOS Safari */
+	  -webkit-user-select: none; /* Safari */
+	   -khtml-user-select: none; /* Konqueror HTML */
+		 -moz-user-select: none; /* Old versions of Firefox */
+		  -ms-user-select: none; /* Internet Explorer/Edge */
+			  user-select: none; /* Non-prefixed version, currently
+									supported by Chrome, Opera and Firefox */
+}
+
+.App {
+	margin: auto;
+	width: 60%;
+	min-width: 600px;
+	position: relative;
+}
+
+.Back {
+	float: left;
+	width: 20%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: flex;
+}
+
+.wrapper {
+	position: relative;
+}
+
+.Back:hover {
+	cursor: pointer;
+	background: rgba(175, 175, 175, 0.288);
+}
+
+.Back > img.back-image{
+	visibility: hidden;
+	opacity: 20%;
+}
+
+.Back:hover > img.back-image{
+	visibility: visible;
+}

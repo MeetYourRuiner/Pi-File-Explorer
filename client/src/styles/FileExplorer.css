@@ -1,0 +1,74 @@
+.noselect {
+	-webkit-touch-callout: none; /* iOS Safari */
+	  -webkit-user-select: none; /* Safari */
+	   -khtml-user-select: none; /* Konqueror HTML */
+		 -moz-user-select: none; /* Old versions of Firefox */
+		  -ms-user-select: none; /* Internet Explorer/Edge */
+			  user-select: none; /* Non-prefixed version, currently
+									supported by Chrome, Opera and Firefox */
+}
+
+table {
+	width: 100%;
+	border-spacing: 0;
+	table-layout: fixed;
+}
+
+/* TH */
+
+th {
+	background: #4b4b4b;
+	color: white;
+}
+
+th.type {
+	width: 32px;
+	padding: 5px 15px;
+}
+
+th.name { 
+	width: 100%;
+}
+
+th.size { 
+	width: 20%;
+}
+
+th.mtime { 
+	width: 200px;
+}
+
+/* TR */
+
+tr {
+	background: #fafafa; /* Цвет фона */
+	height: 64px;
+}
+
+tr:nth-child(2n) {
+	background: #ececec; /* Цвет фона */
+}
+
+tr:hover {
+	background: #979797;
+}
+/* TD */
+
+td {
+	padding: 5px 15px;
+	border-bottom: 1px solid #ddd;
+	overflow: hidden;
+}
+
+td.size {
+	text-align: center;
+	white-space: nowrap;
+}
+
+td.mtime {
+	text-align: right;
+}
+
+img.type-image {
+	width: 100%;
+}
