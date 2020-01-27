@@ -1,5 +1,6 @@
 const express = require("express");
 const FileInfo = require('./file');
+const fileUpload = require('express-fileupload');
 const fs = require("fs").promises;
 
 const app = express();
@@ -15,10 +16,8 @@ app.use(function(request, response, next){
     console.log(data);
     next();
 });
-
 app.get("/api/storage/?*", async (request, response) => {
 	try {
-		console.log("Дошло");
 		let path;
 		if (request.params[0] !== undefined)
 			path = request.params[0];
@@ -34,6 +33,41 @@ app.get("/api/storage/?*", async (request, response) => {
 	} catch (err) {
 		response.status(500).send("ERROR");
 		console.log(err);
+	}
+});
+
+app.use(fileUpload());
+app.post("/api/storage/?*", async (request, response) => {
+	let path;
+		if (request.params[0] !== undefined)
+			path = request.params[0];
+		else 
+			path = "";
+	if (request.files)
+	{
+		try {
+			const payload = request.files.payload;
+			if (Array.isArray(payload))
+			{
+				for (let file of payload)
+				{
+					file.mv(storage + '/' + path + '/' + file.name, (err, result) => {if (err) console.log(err)});
+				}
+				response.send("Uploaded");
+			}
+			else
+			{
+				payload.mv(storage + '/' + path + '/' + payload.name, (err, result) => {if (err) console.log(err)});
+				response.send("Uploaded");
+			}
+		} catch (err) {
+			response.status(500).send("ERROR");
+			console.log(err);
+		}
+	}
+	else 
+	{
+		response.status(400).send("Not a file");
 	}
 });
 

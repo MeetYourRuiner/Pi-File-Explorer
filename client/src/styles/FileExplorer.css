@@ -72,3 +72,8 @@ td.mtime {
 img.type-image {
 	width: 100%;
 }
+
+.dragging {
+	border: black 2px dotted;
+	opacity: 50%;
+}
