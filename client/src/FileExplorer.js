@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import './styles/FileExplorer.css';
-import { FileTable } from './FileTable';
+import { FileTable } from './FileTable/FileTable';
 
 export class FileExplorer extends Component {
 	constructor(props) {
@@ -15,7 +14,6 @@ export class FileExplorer extends Component {
 		this.onClickFolder = this.onClickFolder.bind(this);
 		this.getPath = this.getPath.bind(this);
 		this.onHeaderClick = this.onHeaderClick.bind(this);
-		this.refreshStorage = this.refreshStorage.bind(this);
 	}
 
 	componentDidUpdate() {
@@ -23,10 +21,6 @@ export class FileExplorer extends Component {
 		{
 			this.setState({currentPath: this.getPath()});
 		}
-	}
-
-	refreshStorage() {
-		this.setState({refresh: !this.state.refresh});
 	}
 
 	getPath() {
@@ -58,15 +52,15 @@ export class FileExplorer extends Component {
 
 	render() {
 		return (
-			<FileTable
-			 	path = {this.getPath()}
-				onClickFolder = {this.onClickFolder}
-				onHeaderClick = {this.onHeaderClick}
-				sortKey = {this.state.sortKey}
-				sortDirection = {this.state.sortDirection}
-				frefresh = {this.refreshStorage}
-				refresh = {this.state.refresh}
-			/>
+			<div>
+				<FileTable
+					path = {this.getPath()}
+					onClickFolder = {this.onClickFolder}
+					onHeaderClick = {this.onHeaderClick}
+					sortKey = {this.state.sortKey}
+					sortDirection = {this.state.sortDirection}
+				/>
+			</div>
 		)
 	}
 }

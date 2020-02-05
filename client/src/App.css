@@ -15,31 +15,7 @@
 	position: relative;
 }
 
-.Back {
-	min-width: 200px;
-	float: left;
-	width: 20%;
-	height: 100%;
-	position: fixed;
-	top: 0;
-	left: 0;
-	display: flex;
-}
-
 .wrapper {
 	position: relative;
 }
 
-.Back:hover {
-	cursor: pointer;
-	background: rgba(175, 175, 175, 0.288);
-}
-
-.Back > img.back-image{
-	visibility: hidden;
-	opacity: 20%;
-}
-
-.Back:hover > img.back-image{
-	visibility: visible;
-}

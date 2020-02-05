@@ -1,6 +1,7 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import back_image from './images/back.svg';
+import back_image from '../images/back.svg';
+import './BackComponent.css';
 
 function BackComponent(props) {
 	const handleClick = () => {

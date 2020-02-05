@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import file_image from './images/file2.png'
-import folder_image from './images/folder2.png'
+import fileImage from '../images/file.png'
+import folderImage from '../images/folder.png'
 
 export class TableRow extends Component {
 	convertBytes(size) {
@@ -17,12 +17,12 @@ export class TableRow extends Component {
 	render()
 	{
 		let file = this.props.file;
-		let trClassName = file.isDirectory ? 'folder' : 'file';
-		let trOnClick = file.isDirectory ? () => this.props.onClickFolder(file.name) : undefined;
+		let classNameRow = file.isDirectory ? 'folder' : 'file';
+		let onClickRow = file.isDirectory ? () => this.props.onClickFolder(file.name) : null;
 		return (
-			<tr key = {this.props.name} className={trClassName} onClick = {trOnClick}>
+			<tr key = {this.props.name} className={classNameRow} onClick = {onClickRow}>
 				<td className="type">
-					<img className="type-image" alt="" src = {file.isDirectory ? folder_image : file_image}/>
+					<img className="type-image" alt="" src = {file.isDirectory ? folderImage : fileImage}/>
 				</td>
 				<td className="name">
 					{file.name}

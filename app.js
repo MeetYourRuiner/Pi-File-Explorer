@@ -16,12 +16,13 @@ app.use(function(request, response, next){
     console.log(data);
     next();
 });
+
 app.get("/api/storage/?*", async (request, response) => {
 	try {
 		let path;
 		if (request.params[0] !== undefined)
 			path = request.params[0];
-		else 
+		else  
 			path = "";
 		let filenames = await fs.readdir(storage + '/' + path);
 		let files = [];
@@ -34,6 +35,10 @@ app.get("/api/storage/?*", async (request, response) => {
 		response.status(500).send("ERROR");
 		console.log(err);
 	}
+});
+
+app.get("/api/download/?*/:file", async (request, response) => {
+
 });
 
 app.use(fileUpload());

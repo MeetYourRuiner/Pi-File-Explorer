@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { TableRow } from './TableRow'
+import './FileTable.css';
+import { TableRow } from './TableRow';
+import { ContextMenu } from '../ContextMenu/ContextMenu';
 
 export class FileTable extends Component {
 	constructor(props) {
@@ -8,12 +10,21 @@ export class FileTable extends Component {
 			isDragOver: false,
 			EnterCounter: 0,
 			loading: true,
-			storage: []
+			storage: [],
+			showMenu: false,
+			clickX: 0,
+			clickY: 0
 		}
+		this.rect = React.createRef();
+		this.contextMenu = null;
 		this.sortFunc = this.sortFunc.bind(this);
+		this.contextmenuHandler = this.contextmenuHandler.bind(this);
+		this.clickOutsideHandler = this.clickOutsideHandler.bind(this); 
 	}
 	
 	componentDidMount() {
+		document.addEventListener('contextmenu', (e) => e.preventDefault());
+		document.addEventListener('click', this.clickOutsideHandler);
 		this.fetchStorage();
 	}
 
@@ -50,7 +61,9 @@ export class FileTable extends Component {
 			console.log(error.message);
 		}
 	}
-
+	/* 
+		Drag and drop
+	*/
 	async dropHandler(e) {
 		e.preventDefault();
 		try	{
@@ -63,7 +76,7 @@ export class FileTable extends Component {
 					method:'POST',
 					body: payload
 				});
-				await this.props.fetchStorage();
+				await this.fetchStorage();
 			}
 		} catch(error) {
 			console.log(error.message);
@@ -91,7 +104,34 @@ export class FileTable extends Component {
 		counter++;
 		this.setState({EnterCounter: counter});
 	}
+	/* -------------- */
+	/* 
+		Контекстное меню 
+	*/
+	contextmenuHandler(e) {
+		e.preventDefault();
+		let leftOffset = this.rect.current.getBoundingClientRect().left;
+		this.setState({
+			showMenu: true,
+			clickX: e.pageX - leftOffset,
+			clickY: e.pageY
+		});
+	}
 
+	setContextMenuRef = element => {
+		this.contextMenu = element;
+	};
+
+	clickOutsideHandler(e){
+		if (this.state.showMenu)
+		{
+			if (this.contextMenu && !this.contextMenu.contains(e.target))
+			{
+				this.setState({showMenu: false});
+			}
+		}
+	}
+	/* ----------------- */
 	sortFunc(a, b) {
 		let factor = this.props.sortDirection;
 		let result = 0;
@@ -138,39 +178,46 @@ export class FileTable extends Component {
 	}
 
 	render() {
-		let classNames = "noselect drop-zone";
-		let contents = this.state.loading
-			? <p>Loading</p>
-			: this.renderTable();
+		let tableClassNames = "noselect drop-zone";
 		const sortKey = this.props.sortKey;
 		const sortDirection = this.props.sortDirection === 1 ? "⇑" : "⇓";
+		let contents = this.state.loading
+			? <tbody><tr><td colSpan='4' align="center">Loading</td></tr></tbody>
+			: this.renderTable();
 		if (this.state.isDragOver)
 		{
-			classNames+=" dragging";
+			tableClassNames+=" dragging";
 		}
 		return (
-			<table className= {classNames} 
-				onDrop = {(e) => this.dropHandler(e)} 
-				onDragOver = {(e) => this.dragoverHandler(e)}
-				onDragLeave = {(e) => this.dragleaveHandler(e)}
-				onDragEnter = {(e) => this.dragenterHandler(e)}
-			>
-				<thead>
-                    <tr>
-                        <th className="type"/>
-						<th className="name" onClick={(e) => this.props.onHeaderClick(e)}>
-							Имя { sortKey === 'name' ? sortDirection : '' }
-						</th>
-						<th className="size" onClick={(e) => this.props.onHeaderClick(e)}>
-							Размер { sortKey === 'size' ? sortDirection : '' }
-						</th>
-						<th className="mtime" onClick={(e) => this.props.onHeaderClick(e)}>
-							Дата изменения { sortKey === 'mtime' ? sortDirection : '' }
-						</th>
-                    </tr>
-                </thead>
-				{contents}
-			</table>
+			<div className="table-wrapper">
+
+				{this.state.showMenu && <ContextMenu setContextMenuRef = {this.setContextMenuRef} x = {this.state.clickX} y = {this.state.clickY}/>}
+
+				<table className= {tableClassNames}
+					ref={this.rect}
+					onDrop = {(e) => this.dropHandler(e)} 
+					onDragOver = {(e) => this.dragoverHandler(e)}
+					onDragLeave = {(e) => this.dragleaveHandler(e)}
+					onDragEnter = {(e) => this.dragenterHandler(e)}
+					onContextMenu = {(e) => this.contextmenuHandler(e)}
+				>
+					<thead>
+						<tr>
+							<th className="type"/>
+							<th className="name" onClick={(e) => this.props.onHeaderClick(e)}>
+								Имя { sortKey === 'name' && sortDirection }
+							</th>
+							<th className="size" onClick={(e) => this.props.onHeaderClick(e)}>
+								Размер { sortKey === 'size' && sortDirection }
+							</th>
+							<th className="mtime" onClick={(e) => this.props.onHeaderClick(e)}>
+								Дата изменения { sortKey === 'mtime' && sortDirection }
+							</th>
+						</tr>
+					</thead>
+					{contents}
+				</table>
+			</div>
 		)
 	}
 }
