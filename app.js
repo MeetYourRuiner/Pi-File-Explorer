@@ -52,6 +52,49 @@ app.get("/api/download/?*/:file", async (request, response) => {
 	}
 });
 
+app.delete("/api/storage/?*/:file", async (request, response) => {
+	try {
+		let path;
+		if (request.params[0] !== undefined)
+			path = request.params[0];
+		else 
+			path = "";
+		const filename = request.params.file;
+
+		let stats = await fs.stat(storage + '/' + path +  '/' + filename);
+		if (stats.isDirectory())
+		{
+			const removeRecursive = async (p) => {
+				try {
+					let files = await fs.readdir(p);
+					for (let file of files)
+					{
+						let stat = await fs.stat(p + '/' + file);
+						if (!stat.isDirectory())
+							await fs.unlink(p +  '/' + file);
+						else 
+							await removeRecursive(p + '/' + file);
+					}
+					await fs.rmdir(p);
+				} catch (err) {
+					console.log('Не удалось удалить ' + p);
+				}
+				
+			}
+
+			await removeRecursive(storage + '/' + path +  '/' + filename);
+		}
+		else
+		{
+			await fs.unlink(storage + '/' + path +  '/' + filename);
+		}
+		response.send(`${filename} deleted`);
+	} catch (err) {
+		response.status(500).send("ERROR");
+		console.log(err);	
+	}
+});
+
 app.use(fileUpload());
 app.post("/api/storage/?*", async (request, response) => {
 	let path;

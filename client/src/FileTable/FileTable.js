@@ -20,6 +20,7 @@ class FileTable extends Component {
 		this.sortFunc = this.sortFunc.bind(this);
 		this.contextmenuHandler = this.contextmenuHandler.bind(this);
 		this.clickOutsideHandler = this.clickOutsideHandler.bind(this); 
+		this.contextmenuCloseHandler = this.contextmenuCloseHandler.bind(this);
 	}
 	
 	componentDidMount() {
@@ -69,10 +70,11 @@ class FileTable extends Component {
 		try	{
 			if (e.dataTransfer.items) {
 				const payload = new FormData();
+				let path = this.props.location.pathname;
 				for (let i = 0; i < e.dataTransfer.files.length; i++) {
 					payload.append("payload", e.dataTransfer.files[i]);
 				}
-				await fetch(`/api/storage${this.props.path}`, {
+				await fetch(`/api/storage${path}`, {
 					method:'POST',
 					body: payload
 				});
@@ -135,6 +137,10 @@ class FileTable extends Component {
 			}
 		}
 	}
+
+	contextmenuCloseHandler() {
+		this.setState({showMenu: !this.state.showMenu});
+	}
 	/* ----------------- */
 	sortFunc(a, b) {
 		let factor = this.props.sortDirection;
@@ -169,9 +175,12 @@ class FileTable extends Component {
 		let storage = this.state.storage;
 		return (
 			<tbody>
-					{storage.folders.map(f =>
+					{storage.folders
+						.sort(this.sortFunc)
+						.map(f =>
 						<TableRow 
-							key = {f.name} file = {f} 
+							key = {f.name} 
+							file = {f} 
 							contextmenuHandler = {this.contextmenuHandler}
 						/>
 					)}
@@ -202,7 +211,7 @@ class FileTable extends Component {
 		return (
 			<div className="table-wrapper">
 
-				{this.state.showMenu && <ContextMenu setContextMenuRef = {this.setContextMenuRef} {...this.state.contextProps}/>}
+				{this.state.showMenu && <ContextMenu toggleVisibility = {this.contextmenuCloseHandler} setContextMenuRef = {this.setContextMenuRef} {...this.state.contextProps}/>}
 
 				<table className= {tableClassNames}
 					ref={this.table}

@@ -11,7 +11,7 @@
 
 .Back:hover {
 	cursor: pointer;
-	background: rgba(175, 175, 175, 0.288);
+	background: #222831;
 }
 
 .Back > img.back-image{

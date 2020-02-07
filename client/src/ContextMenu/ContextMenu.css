@@ -1,5 +1,5 @@
 div.context-menu {
-	background-color: #4b4b4b;
+	background-color: #393e46;
 	width: 175px;
 	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
 }
@@ -15,10 +15,16 @@ div.context-menu > ul {
 div.context-menu > ul > li {
 	padding: 5%;
 	font-size: 13pt;
-	color: rgb(228, 228, 228);
-	border-bottom: 1px solid #6e6e6e;
+	color: #eeeeee;
+
+	border-bottom: 1px solid #393e46;
+}
+
+div.context-menu > ul > li:last-child {
+	border-bottom: none;
+
 }
 
 div.context-menu > ul > li:hover {
-	background-color: #6e6e6e;
+	background-color: #222831;
 }

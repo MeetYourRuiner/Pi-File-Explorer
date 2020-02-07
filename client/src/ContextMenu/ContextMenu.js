@@ -4,6 +4,7 @@ import './ContextMenu.css';
 
 class ContextMenu extends Component {
 	async onDownload() {
+		this.props.toggleVisibility();
 		try {
 			const { location, target } = this.props;
 			const response = await fetch('api/download' + location.pathname + '/' + target.name);
@@ -29,8 +30,40 @@ class ContextMenu extends Component {
 		}
 	}
 
+	async onDelete() {
+		this.props.toggleVisibility();
+		try {
+			const { location, target } = this.props;
+			let path = location.pathname;
+			const response = await fetch('/api/storage' + path + '/' + target.name, {
+				method:'DELETE'
+			});
+			if (response.ok)
+			{
+				console.log('Deleted');
+			}
+			else
+			{
+				console.log("Response.Code != 200");
+			}
+		} catch(err) {
+			console.log(err.message);
+		}
+	}
+
 	render() {
 		const { x, y, target } = this.props;
+		let targetType;
+		if (target.name === 'header')
+		{
+			targetType = 0; // HEADER
+		}
+		else 
+		{
+			targetType = target.isDirectory
+				? 1			// DIRECTORY
+				: 2;		// FILE
+		}
 		let styles = {
 			'position': 'absolute',
 			'top': y + 'px',
@@ -40,10 +73,10 @@ class ContextMenu extends Component {
 			<div className="context-menu noselect" style = {styles} ref={this.props.setContextMenuRef}>
 				<ul>
 					<li>Новая папка</li>
-					{!target.isDirectory && <li onClick = {() => this.onDownload()}>Скачать</li>}
-					<li>Переименовать</li>
-					<li>Печать</li>
-					<li>Удалить</li>
+					{ targetType === 2 && <li onClick = {() => this.onDownload()}>Скачать</li>}
+					{ targetType > 0 && <li>Переименовать</li> }
+					{ targetType === 2 && <li>Печать</li> }
+					{ targetType > 0 && <li onClick = {() => this.onDelete()}>Удалить</li> }
 				</ul>
 			</div>
 		);

@@ -17,8 +17,8 @@ table {
 /* TH */
 
 th {
-	background: #4b4b4b;
-	color: white;
+	background: #222831;
+	color: #eeeeee;
 }
 
 th.type {
@@ -41,13 +41,13 @@ th.mtime {
 /* TR */
 
 tr {
-	background: #fafafa; /* Цвет фона */
+	background: #eeeeee; /* Цвет фона */
 	height: 64px;
 	pointer-events: auto;
 }
 
 tr:nth-child(2n) {
-	background: #ececec; /* Цвет фона */
+	background: #eeeeee; /* Цвет фона */
 }
 
 tr:hover {
@@ -57,8 +57,8 @@ tr:hover {
 
 td {
 	padding: 5px 15px;
-	border-bottom: 1px solid #ddd;
 	overflow: hidden;
+	border-bottom: 1px solid #ddd;
 }
 
 td.size {
