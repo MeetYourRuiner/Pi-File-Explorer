@@ -1,9 +1,9 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
 import back_image from '../images/back.svg';
-import './BackComponent.css';
+import './BackButton.css';
 
-function BackComponent(props) {
+function BackButton(props) {
 	const handleClick = () => {
 		if (props.location.pathname !== '/')
 			props.history.goBack();
@@ -16,4 +16,4 @@ function BackComponent(props) {
 	);
 }
 
-export default withRouter(BackComponent)
+export default withRouter(BackButton)

@@ -43,6 +43,7 @@ th.mtime {
 tr {
 	background: #fafafa; /* Цвет фона */
 	height: 64px;
+	pointer-events: auto;
 }
 
 tr:nth-child(2n) {

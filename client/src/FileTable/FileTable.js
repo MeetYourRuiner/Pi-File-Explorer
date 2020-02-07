@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import './FileTable.css';
-import { TableRow } from './TableRow';
-import { ContextMenu } from '../ContextMenu/ContextMenu';
+import TableRow from './TableRow';
+import ContextMenu from '../ContextMenu/ContextMenu';
+import { withRouter } from "react-router";
 
-export class FileTable extends Component {
+class FileTable extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -12,10 +13,9 @@ export class FileTable extends Component {
 			loading: true,
 			storage: [],
 			showMenu: false,
-			clickX: 0,
-			clickY: 0
+			contextProps: {}
 		}
-		this.rect = React.createRef();
+		this.table = React.createRef();
 		this.contextMenu = null;
 		this.sortFunc = this.sortFunc.bind(this);
 		this.contextmenuHandler = this.contextmenuHandler.bind(this);
@@ -29,13 +29,13 @@ export class FileTable extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (prevProps.path !== this.props.path)
+		if (prevProps.location.pathname !== this.props.location.pathname)
 			this.fetchStorage();
 	}
 
 	async fetchStorage() {
 		this.setState({loading: true})
-		let path = this.props.path;
+		let path = this.props.location.pathname;
 		try	{
 			const response = await fetch('/api/storage' + path);
 			if (response.ok)
@@ -105,16 +105,20 @@ export class FileTable extends Component {
 		this.setState({EnterCounter: counter});
 	}
 	/* -------------- */
+
 	/* 
 		Контекстное меню 
 	*/
-	contextmenuHandler(e) {
+	contextmenuHandler(e, target) {
 		e.preventDefault();
-		let leftOffset = this.rect.current.getBoundingClientRect().left;
+		let leftOffset = this.table.current.getBoundingClientRect().left;
 		this.setState({
 			showMenu: true,
-			clickX: e.pageX - leftOffset,
-			clickY: e.pageY
+			contextProps: {
+				x: e.pageX - leftOffset, 
+				y: e.pageY, 
+				target: target
+			}
 		});
 	}
 
@@ -166,12 +170,19 @@ export class FileTable extends Component {
 		return (
 			<tbody>
 					{storage.folders.map(f =>
-						<TableRow key = {f.name} file = {f} onClickFolder = {this.props.onClickFolder}/>
+						<TableRow 
+							key = {f.name} file = {f} 
+							contextmenuHandler = {this.contextmenuHandler}
+						/>
 					)}
 					{storage.files
 						.sort(this.sortFunc)
 						.map(f =>
-							<TableRow key = {f.name} file = {f}/>
+							<TableRow 
+								key = {f.name} 
+								file = {f} 
+								contextmenuHandler = {this.contextmenuHandler}
+							/>
 					)}
 			</tbody>
 		);
@@ -191,18 +202,17 @@ export class FileTable extends Component {
 		return (
 			<div className="table-wrapper">
 
-				{this.state.showMenu && <ContextMenu setContextMenuRef = {this.setContextMenuRef} x = {this.state.clickX} y = {this.state.clickY}/>}
+				{this.state.showMenu && <ContextMenu setContextMenuRef = {this.setContextMenuRef} {...this.state.contextProps}/>}
 
 				<table className= {tableClassNames}
-					ref={this.rect}
+					ref={this.table}
 					onDrop = {(e) => this.dropHandler(e)} 
 					onDragOver = {(e) => this.dragoverHandler(e)}
 					onDragLeave = {(e) => this.dragleaveHandler(e)}
 					onDragEnter = {(e) => this.dragenterHandler(e)}
-					onContextMenu = {(e) => this.contextmenuHandler(e)}
 				>
 					<thead>
-						<tr>
+						<tr onContextMenu = {(e) => this.contextmenuHandler(e, {name:'header'})}>
 							<th className="type"/>
 							<th className="name" onClick={(e) => this.props.onHeaderClick(e)}>
 								Имя { sortKey === 'name' && sortDirection }
@@ -221,3 +231,5 @@ export class FileTable extends Component {
 		)
 	}
 }
+
+export default withRouter(FileTable);

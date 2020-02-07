@@ -1,43 +1,18 @@
 import React, { Component } from 'react';
-import { FileTable } from './FileTable/FileTable';
+import FileTable from './FileTable/FileTable';
 
 export class FileExplorer extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			storage: [],
-			refresh: false,
-			currentPath: this.getPath(),
 			sortKey: 'name',
 			sortDirection: 1
 		}
-		this.onClickFolder = this.onClickFolder.bind(this);
-		this.getPath = this.getPath.bind(this);
 		this.onHeaderClick = this.onHeaderClick.bind(this);
-	}
-
-	componentDidUpdate() {
-		if (this.getPath() !== this.state.currentPath)
-		{
-			this.setState({currentPath: this.getPath()});
-		}
-	}
-
-	getPath() {
-		let path = this.props.location.pathname;
-		if (path === '/')
-			path = '';
-		return path;
-	}
-
-	onClickFolder(folderName) {
-		console.log("Push: " + this.state.currentPath + '/' + folderName);
-		this.props.history.push(this.state.currentPath + '/' + folderName);
 	}
 
 	onHeaderClick(e) {
 		e.preventDefault();
-		e.stopPropagation();
 		if (e.target.className === this.state.sortKey)
 		{
 			let factor = this.state.sortDirection;
@@ -54,8 +29,6 @@ export class FileExplorer extends Component {
 		return (
 			<div>
 				<FileTable
-					path = {this.getPath()}
-					onClickFolder = {this.onClickFolder}
 					onHeaderClick = {this.onHeaderClick}
 					sortKey = {this.state.sortKey}
 					sortDirection = {this.state.sortDirection}
@@ -64,3 +37,5 @@ export class FileExplorer extends Component {
 		)
 	}
 }
+
+export default FileExplorer;

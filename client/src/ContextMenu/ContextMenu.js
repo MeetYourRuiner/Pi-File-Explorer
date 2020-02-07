@@ -1,17 +1,36 @@
 import React, { Component } from 'react';
+import { withRouter } from "react-router";
 import './ContextMenu.css';
 
-export class ContextMenu extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			visible: false
+class ContextMenu extends Component {
+	async onDownload() {
+		try {
+			const { location, target } = this.props;
+			const response = await fetch('api/download' + location.pathname + '/' + target.name);
+			if (response.ok)
+			{
+				let blob = await response.blob();
+				const url = window.URL.createObjectURL(new Blob([blob]));
+				const link = document.createElement('a');
+				link.href = url;
+				link.setAttribute('download', target.name);
+				document.body.appendChild(link);
+				link.click();
+				link.parentNode.removeChild(link);
+
+				console.log('Downloaded');
+			}
+			else
+			{
+				console.log("Response.Code != 200");
+			}
+		} catch(err) {
+			console.log(err.message);
 		}
 	}
 
 	render() {
-		let x = this.props.x;
-		let y = this.props.y;
+		const { x, y, target } = this.props;
 		let styles = {
 			'position': 'absolute',
 			'top': y + 'px',
@@ -21,7 +40,7 @@ export class ContextMenu extends Component {
 			<div className="context-menu noselect" style = {styles} ref={this.props.setContextMenuRef}>
 				<ul>
 					<li>Новая папка</li>
-					<li>Скачать</li>
+					{!target.isDirectory && <li onClick = {() => this.onDownload()}>Скачать</li>}
 					<li>Переименовать</li>
 					<li>Печать</li>
 					<li>Удалить</li>
@@ -30,3 +49,5 @@ export class ContextMenu extends Component {
 		);
 	}
 }
+
+export default withRouter(ContextMenu);

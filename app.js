@@ -38,7 +38,18 @@ app.get("/api/storage/?*", async (request, response) => {
 });
 
 app.get("/api/download/?*/:file", async (request, response) => {
-
+	try {
+		let path;
+		if (request.params[0] !== undefined)
+				path = request.params[0];
+		else
+			path = "";
+		const filename = request.params.file;
+		response.download(storage + '/' + path + '/' + filename);
+	} catch (err) {
+		response.status(500).send("ERROR");
+		console.log(err);	
+	}
 });
 
 app.use(fileUpload());

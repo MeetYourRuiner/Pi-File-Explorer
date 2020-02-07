@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import { withRouter } from "react-router";
 import fileImage from '../images/file.png'
 import folderImage from '../images/folder.png'
 
-export class TableRow extends Component {
+class TableRow extends Component {
 	convertBytes(size) {
 		const prefixes = ['B', 'KB', 'MB', 'GB'];
 		let power = 0;
@@ -14,13 +15,27 @@ export class TableRow extends Component {
 		return size + ' ' + prefixes[power];
 	}
 
+	onClickFolder(folderName)
+	{
+		let path = this.props.location.pathname;
+		if (path === '/')
+			path = '';
+		console.log("Push: " + path + '/' + folderName);
+		this.props.history.push(path + '/' + folderName);
+	}
+
 	render()
 	{
 		let file = this.props.file;
 		let classNameRow = file.isDirectory ? 'folder' : 'file';
-		let onClickRow = file.isDirectory ? () => this.props.onClickFolder(file.name) : null;
+		let onClickRow = file.isDirectory ? () => this.onClickFolder(file.name) : null;
 		return (
-			<tr key = {this.props.name} className={classNameRow} onClick = {onClickRow}>
+			<tr 
+				key = {this.props.name} 
+				className={classNameRow} 
+				onClick = {onClickRow} 
+				onContextMenu = {(e) => this.props.contextmenuHandler(e, file)}
+			>
 				<td className="type">
 					<img className="type-image" alt="" src = {file.isDirectory ? folderImage : fileImage}/>
 				</td>
@@ -37,3 +52,5 @@ export class TableRow extends Component {
 		)
 	}
 }
+
+export default withRouter(TableRow);
