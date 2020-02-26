@@ -3,24 +3,29 @@ import './FileTable.css';
 import TableRow from './TableRow';
 import ContextMenu from '../ContextMenu/ContextMenu';
 import { withRouter } from "react-router";
+import Dialog from '../Dialog/Dialog';
 
 class FileTable extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
+			storage: [],
 			isDragOver: false,
 			EnterCounter: 0,
 			loading: true,
-			storage: [],
 			showMenu: false,
-			contextProps: {}
+			contextProps: {},
+			dialogState: null,
+			dialogData: null
 		}
-		this.table = React.createRef();
-		this.contextMenu = null;
+		this.table = React.createRef(); // Для отслеживания размера
+		this.contextMenuRef = null; 	// Реф для закрытия контекстного меню по клику на пустое место
+		this.fetchStorage = this.fetchStorage.bind(this);
 		this.sortFunc = this.sortFunc.bind(this);
 		this.contextmenuHandler = this.contextmenuHandler.bind(this);
 		this.clickOutsideHandler = this.clickOutsideHandler.bind(this); 
 		this.contextmenuCloseHandler = this.contextmenuCloseHandler.bind(this);
+		this.setDialogState = this.setDialogState.bind(this);
 	}
 	
 	componentDidMount() {
@@ -74,7 +79,7 @@ class FileTable extends Component {
 				for (let i = 0; i < e.dataTransfer.files.length; i++) {
 					payload.append("payload", e.dataTransfer.files[i]);
 				}
-				await fetch(`/api/storage${path}`, {
+				await fetch(`/api/upload${path}`, {
 					method:'POST',
 					body: payload
 				});
@@ -125,13 +130,13 @@ class FileTable extends Component {
 	}
 
 	setContextMenuRef = element => {
-		this.contextMenu = element;
+		this.contextMenuRef = element;
 	};
 
 	clickOutsideHandler(e){
 		if (this.state.showMenu)
 		{
-			if (this.contextMenu && !this.contextMenu.contains(e.target))
+			if (this.contextMenuRef && !this.contextMenuRef.contains(e.target))
 			{
 				this.setState({showMenu: false});
 			}
@@ -141,6 +146,10 @@ class FileTable extends Component {
 	contextmenuCloseHandler() {
 		this.setState({showMenu: !this.state.showMenu});
 	}
+
+	setDialogState(type, data = null) {
+		this.setState({dialogState: type, dialogData: data});
+	} 
 	/* ----------------- */
 	sortFunc(a, b) {
 		let factor = this.props.sortDirection;
@@ -198,20 +207,41 @@ class FileTable extends Component {
 	}
 
 	render() {
-		let tableClassNames = "noselect drop-zone";
-		const sortKey = this.props.sortKey;
-		const sortDirection = this.props.sortDirection === 1 ? "⇑" : "⇓";
-		let contents = this.state.loading
+		let {
+			loading, 
+			dialogState, 
+			dialogData,
+		} = this.state;
+
+		let contents = loading
 			? <tbody><tr><td colSpan='4' align="center">Loading</td></tr></tbody>
 			: this.renderTable();
+		
+		const sortKey = this.props.sortKey;
+		const sortDirection = this.props.sortDirection === 1 ? "⇑" : "⇓";
+		
+		let tableClassNames = "noselect drop-zone";
 		if (this.state.isDragOver)
 		{
 			tableClassNames+=" dragging";
 		}
+
 		return (
 			<div className="table-wrapper">
 
-				{this.state.showMenu && <ContextMenu toggleVisibility = {this.contextmenuCloseHandler} setContextMenuRef = {this.setContextMenuRef} {...this.state.contextProps}/>}
+				{this.state.showMenu && <ContextMenu 
+					toggleVisibility = {this.contextmenuCloseHandler} 
+					setContextMenuRef = {this.setContextMenuRef}
+					setDialogState = {this.setDialogState}
+					{...this.state.contextProps}
+				/>}
+
+				<Dialog
+					type = {dialogState}
+					data = {dialogData}
+					setDialogState = {this.setDialogState}
+					fetchStorage = {this.fetchStorage}
+				/>
 
 				<table className= {tableClassNames}
 					ref={this.table}

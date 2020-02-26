@@ -17,6 +17,7 @@ app.use(function(request, response, next){
     next();
 });
 
+//	Получение содержимого папки
 app.get("/api/storage/?*", async (request, response) => {
 	try {
 		let path;
@@ -37,6 +38,7 @@ app.get("/api/storage/?*", async (request, response) => {
 	}
 });
 
+//	Скачивание файла
 app.get("/api/download/?*/:file", async (request, response) => {
 	try {
 		let path;
@@ -52,7 +54,8 @@ app.get("/api/download/?*/:file", async (request, response) => {
 	}
 });
 
-app.delete("/api/storage/?*/:file", async (request, response) => {
+//	Удаление файла/папки
+app.delete("/api/delete/?*/:file", async (request, response) => {
 	try {
 		let path;
 		if (request.params[0] !== undefined)
@@ -95,8 +98,9 @@ app.delete("/api/storage/?*/:file", async (request, response) => {
 	}
 });
 
+//	Загрузка файла
 app.use(fileUpload());
-app.post("/api/storage/?*", async (request, response) => {
+app.post("/api/upload/?*", async (request, response) => {
 	let path;
 		if (request.params[0] !== undefined)
 			path = request.params[0];
@@ -127,6 +131,42 @@ app.post("/api/storage/?*", async (request, response) => {
 	else 
 	{
 		response.status(400).send("Not a file");
+	}
+});
+
+//	Новая папка
+app.post("/api/create/?*/:folder", async (request, response) => {
+	let path;
+	if (request.params[0] !== undefined)
+		path = request.params[0];
+	else 
+		path = "";
+	let folderName = request.params.folder;
+	try {
+		await fs.mkdir(storage + '/' + path + '/' + folderName);
+		response.send(storage + '/' + path + '/' + folderName + ' created');
+	} catch (err) {
+		response.status(500).send("ERROR");
+		console.log(err);
+	}
+});
+
+//	Переименование
+app.patch("/api/rename/?*/:oldName/:newName", async (request, response) => {
+	let path;
+	if (request.params[0] !== undefined)
+		path = request.params[0];
+	else 
+		path = "";
+	let toRename = request.params.oldName;
+	let newName = request.params.newName;
+	try {
+		let fullPath = storage + '/' + path + '/';
+		await fs.rename(fullPath + toRename, fullPath + newName);
+		response.send(fullPath + toRename + ' renamed');
+	} catch (err) {
+		response.status(500).send("ERROR");
+		console.log(err);
 	}
 });
 

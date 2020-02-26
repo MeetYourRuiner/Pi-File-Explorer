@@ -30,25 +30,32 @@ class ContextMenu extends Component {
 		}
 	}
 
-	async onDelete() {
+	onCreateFolder() {
 		this.props.toggleVisibility();
-		try {
-			const { location, target } = this.props;
-			let path = location.pathname;
-			const response = await fetch('/api/storage' + path + '/' + target.name, {
-				method:'DELETE'
-			});
-			if (response.ok)
-			{
-				console.log('Deleted');
-			}
-			else
-			{
-				console.log("Response.Code != 200");
-			}
-		} catch(err) {
-			console.log(err.message);
-		}
+		const { location, setDialogState } = this.props;
+		let path = location.pathname;
+		setDialogState('folder', path);
+	}
+
+	onDelete() {
+		this.props.toggleVisibility();
+		const { location, target, setDialogState } = this.props;
+		let path = location.pathname + '/' + target.name;
+		setDialogState('delete', path);
+	}
+
+	onPrint() {
+		this.props.toggleVisibility();
+		const { location, target, setDialogState } = this.props;
+		let path = location.pathname + '/' + target.name;
+		setDialogState('print', path);
+	}
+
+	onRename() {
+		this.props.toggleVisibility();
+		const { location, target, setDialogState } = this.props;
+		let path = location.pathname + '/' + target.name;
+		setDialogState('rename', path);
 	}
 
 	render() {
@@ -72,10 +79,10 @@ class ContextMenu extends Component {
 		return (
 			<div className="context-menu noselect" style = {styles} ref={this.props.setContextMenuRef}>
 				<ul>
-					<li>Новая папка</li>
+					<li onClick = {() => this.onCreateFolder()}>Новая папка</li>
 					{ targetType === 2 && <li onClick = {() => this.onDownload()}>Скачать</li>}
-					{ targetType > 0 && <li>Переименовать</li> }
-					{ targetType === 2 && <li>Печать</li> }
+					{ targetType > 0 && <li onClick = {() => this.onRename()}>Переименовать</li> }
+					{ targetType === 2 && <li onClick = {() => this.onPrint()}>Печать</li> }
 					{ targetType > 0 && <li onClick = {() => this.onDelete()}>Удалить</li> }
 				</ul>
 			</div>
